@@ -5,8 +5,10 @@ services:
     build:
       context: .
       dockerfile: ./build/Dockerfile
+    environment:
+      - PORT
     ports:
-      - "3000:3000"
+      - ${PORT}:${PORT}
     volumes:
       - ./:/app
-    command: ["./start.sh"]
+    command: ["./build/start.sh"]

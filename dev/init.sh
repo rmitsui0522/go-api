@@ -1,9 +1,9 @@
 #!/bin/bash -eu
 
-docker-compose up -d --build
-
-# .envファイル内の変数を参照する
 source ./.env
+
+docker-compose up -d --build
+# dev/db_restore.sh
 
 echo ""
 echo "---------------------------------------------"

@@ -19,6 +19,10 @@ func New(db *gorm.DB) http.Handler {
 	e.GET("/health", h.health)
 
 	e.GET("/users", h.getUsers)
+	e.POST("/users", h.createUser)
+	e.GET("/users/:id", h.getUser)
+	e.PUT("/users/:id", h.updateUser)
+	e.DELETE("/users/:id", h.deleteUser)
 
 	return e
 }

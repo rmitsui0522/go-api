@@ -30,6 +30,9 @@ func (h *handler) getUsers(c echo.Context) error {
 
 func (h *handler) createUser(c echo.Context) error {
 	var user User
+	user.CreateAt = time.Now().Round(time.Second)
+	user.UpdateAt = time.Now().Round(time.Second)
+
 	err := c.Bind(&user)
 	if err != nil {
 		return err

@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/signal"
 
-	"go-api/pkg/handler"
 	"go-api/pkg/utility"
+	"go-api/pkg/v1/handler"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"

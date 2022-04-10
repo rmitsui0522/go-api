@@ -8,6 +8,8 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+const BASE_URL = "/api/v1"
+
 func New(db *gorm.DB) http.Handler {
 	e := echo.New()
 	e.Use(middleware.CORS())
@@ -16,13 +18,13 @@ func New(db *gorm.DB) http.Handler {
 		DB: db,
 	}
 
-	e.GET("/health", h.health)
+	e.GET(BASE_URL+"/health", h.health)
 
-	e.GET("/users", h.getUsers)
-	e.POST("/users", h.createUser)
-	e.GET("/users/:id", h.getUser)
-	e.PUT("/users/:id", h.updateUser)
-	e.DELETE("/users/:id", h.deleteUser)
+	e.GET(BASE_URL+"/users", h.getUsers)
+	e.POST(BASE_URL+"/users", h.createUser)
+	e.GET(BASE_URL+"/users/:id", h.getUser)
+	e.PUT(BASE_URL+"/users/:id", h.updateUser)
+	e.DELETE(BASE_URL+"/users/:id", h.deleteUser)
 
 	return e
 }

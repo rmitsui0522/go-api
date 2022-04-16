@@ -7,11 +7,16 @@ services:
       dockerfile: ./build/Dockerfile
     environment:
       - PORT
+      - DB_ROOT_PASSWORD
+      - DB_DATABASE
+      - DB_USER
+      - DB_PASSWORD
+      - DB_PROTOCOL
     ports:
       - ${PORT}:${PORT}
     volumes:
-      - ./:/app
-    command: ["./build/start.sh"]
+      - ./app:/app
+    command: ["/app/start.sh"]
     depends_on:
       - database
 

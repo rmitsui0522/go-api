@@ -20,7 +20,7 @@ func JsonFormat(str string) string {
 }
 
 func LoadEnv() {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load("/.env")
 
 	if err != nil {
 		fmt.Printf("環境変数を読み込めませんでした: %v", err)

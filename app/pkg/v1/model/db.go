@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 
-	"go-api/pkg/utility"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -14,14 +12,11 @@ import (
 var DB *gorm.DB
 
 func init() {
-	utility.LoadEnv()
-
 	var err error
 	DB, err = gorm.Open("mysql", dsn())
 	if err != nil {
 		log.Fatal("gorm.Open() failed: ", err)
 	}
-
 }
 
 func dsn() string {

@@ -14,7 +14,7 @@ func (h *handler) getUsers(c echo.Context) error {
 	users, err := model.FindUsers()
 
 	if err != nil {
-		return err
+		return c.JSON(http.StatusNotFound, map[string]string{"message": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, users)
@@ -59,11 +59,11 @@ func (h *handler) updateUser(c echo.Context) error {
 	id, _ := strconv.ParseUint(paramId, 10, 64)
 
 	if err := c.Bind(&data); err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
 
 	if err := validate.Struct(&data); err != nil {
-		return c.JSON(http.StatusNotAcceptable, err.Error())
+		return c.JSON(http.StatusNotAcceptable, map[string]string{"message": err.Error()})
 	}
 
 	user, err := model.UpdateUser(&model.User{ID: uint(id)}, &data)

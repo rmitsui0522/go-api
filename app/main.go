@@ -8,13 +8,11 @@ import (
 	"os"
 	"os/signal"
 
-	"go-api/pkg/utility"
 	"go-api/pkg/v1/handler"
 	"go-api/pkg/v1/model"
 )
 
 func main() {
-	utility.LoadEnv()
 	h := handler.New()
 
 	server := &http.Server{

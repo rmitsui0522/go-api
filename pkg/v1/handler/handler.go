@@ -17,14 +17,19 @@ func New() http.Handler {
 
 	h := &handler{}
 
-	e.GET(BASE_URL+"/health", h.health)
+	e.GET("/health", h.health)
 
-	e.GET(BASE_URL+"/users", h.getUsers)
-	e.POST(BASE_URL+"/users", h.createUser)
-	e.GET(BASE_URL+"/users/:id", h.getUser)
-	e.PUT(BASE_URL+"/users/:id", h.updateUser)
-	e.DELETE(BASE_URL+"/users/:id", h.deleteUser)
+	api := e.Group(BASE_URL)
+	auth := api.Group("/auth")
+	users := api.Group("/users")
 
+	auth.POST("/", h.auth)
+
+	users.GET("/", h.getUsers)
+	users.POST("/", h.createUser)
+	users.GET("/:id", h.getUser)
+	users.PUT("/:id", h.updateUser)
+	users.DELETE("/:id", h.deleteUser)
 
 	return e
 }

@@ -2,25 +2,16 @@ package handler
 
 import (
 	"net/http"
-	"time"
+	"strconv"
+
+	"go-api/pkg/v1/model"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 )
 
-type User struct {
-	ID          uint      `json:"id" param:"id"`
-	FirstName   string    `json:"firstName" validate:"required"`
-	LastName    string    `json:"lastName" validate:"required"`
-	MailAddress string    `json:"mailAddress" validate:"required,email"`
-	CreateAt    time.Time `json:"createAt"`
-	UpdateAt    time.Time `json:"updateAt"`
-}
-
 func (h *handler) getUsers(c echo.Context) error {
-	var users []User
-
-	err := h.DB.Find(&users).Error
+	users, err := model.FindUsers()
 
 	if err != nil {
 		return err
@@ -30,11 +21,8 @@ func (h *handler) getUsers(c echo.Context) error {
 }
 
 func (h *handler) createUser(c echo.Context) error {
-	var user User
+	var user model.User
 	validate := validator.New()
-
-	user.CreateAt = time.Now().Round(time.Second)
-	user.UpdateAt = time.Now().Round(time.Second)
 
 	if err := c.Bind(&user); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -44,7 +32,7 @@ func (h *handler) createUser(c echo.Context) error {
 		return c.String(http.StatusNotAcceptable, err.Error())
 	}
 
-	if err := h.DB.Create(&user).Error; err != nil {
+	if err := model.CreateUser(&user); err != nil {
 		return c.String(http.StatusNotAcceptable, err.Error())
 	}
 
@@ -52,10 +40,10 @@ func (h *handler) createUser(c echo.Context) error {
 }
 
 func (h *handler) getUser(c echo.Context) error {
-	var user User
 	paramId := c.Param("id")
+	id, _ := strconv.ParseUint(paramId, 10, 64)
+	user, err := model.FindUser(&model.User{ID: uint(id)})
 
-	err := h.DB.Where("id=?", paramId).Find(&user).Error
 	if err != nil {
 		return err
 	}
@@ -64,22 +52,21 @@ func (h *handler) getUser(c echo.Context) error {
 }
 
 func (h *handler) updateUser(c echo.Context) error {
-	var user User
-	var data User
+	var data model.User
 	validate := validator.New()
 
 	paramId := c.Param("id")
-	data.UpdateAt = time.Now().Round(time.Second)
+	id, _ := strconv.ParseUint(paramId, 10, 64)
 
 	if err := c.Bind(&data); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	if err := validate.Struct(&user); err != nil {
-		return c.String(http.StatusNotAcceptable, err.Error())
+	if err := validate.Struct(&data); err != nil {
+		return c.JSON(http.StatusNotAcceptable, err.Error())
 	}
 
-	err := h.DB.Where("id=?", paramId).Find(&user).Update(&data).Error
+	user, err := model.UpdateUser(&model.User{ID: uint(id)}, &data)
 	if err != nil {
 		return err
 	}
@@ -88,10 +75,10 @@ func (h *handler) updateUser(c echo.Context) error {
 }
 
 func (h *handler) deleteUser(c echo.Context) error {
-	var user User
 	paramId := c.Param("id")
+	id, _ := strconv.ParseUint(paramId, 10, 64)
 
-	err := h.DB.Where("id=?", paramId).Delete(&user).Error
+	user, err := model.DeleteUser(&model.User{ID: uint(id)})
 	if err != nil {
 		return err
 	}

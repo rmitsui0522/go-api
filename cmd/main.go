@@ -10,26 +10,19 @@ import (
 
 	"go-api/pkg/utility"
 	"go-api/pkg/v1/handler"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"go-api/pkg/v1/model"
 )
 
 func main() {
 	utility.LoadEnv()
-
-	db, err := gorm.Open("mysql", dsn())
-	if err != nil {
-		log.Fatal("gorm.Open() failed: ", err)
-	}
-	defer db.Close()
-
-	h := handler.New(db)
+	h := handler.New()
 
 	server := &http.Server{
 		Addr:    port(),
 		Handler: h,
 	}
+
+	defer model.DB.Close()
 
 	go func() {
 		stop := make(chan os.Signal, 1)

@@ -3,20 +3,19 @@ package handler
 import (
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 const BASE_URL = "/api/v1"
 
-func New(db *gorm.DB) http.Handler {
+type handler struct{}
+
+func New() http.Handler {
 	e := echo.New()
 	e.Use(middleware.CORS())
 
-	h := &handler{
-		DB: db,
-	}
+	h := &handler{}
 
 	e.GET(BASE_URL+"/health", h.health)
 
@@ -26,11 +25,8 @@ func New(db *gorm.DB) http.Handler {
 	e.PUT(BASE_URL+"/users/:id", h.updateUser)
 	e.DELETE(BASE_URL+"/users/:id", h.deleteUser)
 
-	return e
-}
 
-type handler struct {
-	DB *gorm.DB
+	return e
 }
 
 func (h *handler) health(c echo.Context) error {

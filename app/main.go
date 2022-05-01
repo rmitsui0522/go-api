@@ -10,8 +10,8 @@ import (
 
 	conn "go-api/pkg/connection"
 
-	"go-api/pkg/v1/handler"
-	"go-api/pkg/v1/model"
+	"go-api/pkg/handler"
+	"go-api/pkg/model"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-api/pkg/v1/model"
+	"go-api/pkg/model"
 
 	validator "github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
@@ -12,9 +12,6 @@ import (
 
 func GetAllUsers() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if isAuthentication() {
-		}
-
 		users, err := model.FindUsers()
 
 		if err != nil {

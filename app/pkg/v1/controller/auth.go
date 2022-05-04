@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go-api/pkg/middleware/auth"
+	"go-api/pkg/auth"
 	"go-api/pkg/model"
-	jwt "github.com/golang-jwt/jwt/v4"
 	"go-api/pkg/utility"
 )
 
@@ -39,7 +38,7 @@ func Authentication() http.HandlerFunc {
 			return
 		}
 
-		token, err := createJwtTokenString(user)
+		token, err := auth.NewJwtTokenString(user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

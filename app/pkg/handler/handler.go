@@ -1,24 +1,19 @@
 package handler
 
 import (
-	"net/http"
-
 	"go-api/pkg/middleware/auth0"
-	"go-api/pkg/middleware/logger"
 	"go-api/pkg/v1/controller"
 
 	"github.com/gorilla/mux"
 )
 
-func New() http.Handler {
+func New() *mux.Router {
 	handler := mux.NewRouter()
 	api := handler.PathPrefix("/api").Subrouter()
 	v1 := api.PathPrefix("/v1").Subrouter()
 
-	loggerMiddleware := logger.NewMiddleware()
 	jwtMiddleware := auth0.NewMiddleware()
 
-	handler.Use(loggerMiddleware)
 	v1.Use(jwtMiddleware)
 
 	handler.HandleFunc("/health", controller.Health()).Methods("GET")

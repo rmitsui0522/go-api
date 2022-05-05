@@ -7,21 +7,38 @@ import (
 	"os/signal"
 
 	conn "go-api/pkg/connection"
-	"go-api/pkg/handler"
+	apiHandler "go-api/pkg/handler"
+	"go-api/pkg/middleware/auth0"
 	"go-api/pkg/middleware/logger"
 	"go-api/pkg/model"
+
+	"github.com/rs/cors"
 )
 
 func main() {
-	h := handler.New()
+	api := apiHandler.New()
 
 	log := logger.NewLogger()
 	logMiddleware := logger.NewMiddleware(log)
-	h.Use(logMiddleware)
+	jwtMiddleware, err := auth0.NewMiddleware()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Fatal: initialize jwt middleware")
+	}
+
+	api.Use(logMiddleware)
+	api.Use(jwtMiddleware)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Authorization"},
+	})
+
+	handler := c.Handler(api)
 
 	server := &http.Server{
 		Addr:    conn.Port(),
-		Handler: h,
+		Handler: handler,
 	}
 
 	defer model.DB.Close()

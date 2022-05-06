@@ -8,7 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.4.0
-	github.com/rs/cors v1.8.2
+	github.com/justinas/alice v1.2.0
 	github.com/rs/zerolog v1.26.1
 )
 

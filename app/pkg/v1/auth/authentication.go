@@ -1,4 +1,4 @@
-package controller
+package auth
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ func Authentication() http.HandlerFunc {
 
 		user, err := model.FindUser(&model.User{Account: req.Account})
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 

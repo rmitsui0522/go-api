@@ -2,7 +2,7 @@ package auth0
 
 const (
 	domain       = "dev-7k26twuf.us.auth0.com"
-	clientID     = "0ct351U4gJkkVgaO7BMtqUcTH4bfT7Te"
-	clientSecret = "tZRfvxjQL1ah17zZ_3dTm9O7YuHrE-hosBNbPpXj7mt6ktNbqnoFn8x8kcE27JDd"
+	clientID     = "ct6qRL136MieIKUIXtLjTcInqnpprQL3"
+	clientSecret = "a2nsYFSutvNZsrlZ6LqUx8FdYq4suvOxQ6W9hP18uEslCA93NFgDi-PD0yMzRhB1"
 	audience     = "http://localhost:3001/api/v1/"
 )

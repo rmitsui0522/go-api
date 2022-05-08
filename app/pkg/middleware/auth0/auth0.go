@@ -1,53 +1,67 @@
 package auth0
 
 import (
-	"errors"
-	"fmt"
+	"context"
+	"log"
 	"net/http"
+	"net/url"
+	"time"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	"github.com/form3tech-oss/jwt-go"
+	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	"github.com/auth0/go-jwt-middleware/v2/jwks"
+	"github.com/auth0/go-jwt-middleware/v2/validator"
 )
 
-func newMiddleware(jwks *JWKS) (*jwtmiddleware.JWTMiddleware, error) {
-	options := jwtmiddleware.Options{
-		ValidationKeyGetter: newValidationKeyGetter(domain, clientID, jwks),
-		SigningMethod:       jwt.SigningMethodRS256,
-		ErrorHandler:        func(w http.ResponseWriter, r *http.Request, err string) {},
-	}
-	return jwtmiddleware.New(options), nil
+// CustomClaims contains custom data we want from the token.
+type CustomClaims struct {
+	Scope string `json:"scope"`
 }
 
-func newValidationKeyGetter(domain, clientID string, jwks *JWKS) func(*jwt.Token) (interface{}, error) {
-	return func(token *jwt.Token) (interface{}, error) {
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			return token, errors.New("invalid claims type")
-		}
+// Validate does nothing for this example, but we need
+// it to satisfy validator.CustomClaims interface.
+func (c CustomClaims) Validate(ctx context.Context) error {
+	return nil
+}
 
-		// azpフィールドを見て、適切なClientIDのJWTかチェックする
-		azp, ok := claims["azp"].(string)
+// this is a middleware that will check the validity of our JWT.
+func NewMiddleware() func(next http.Handler) http.Handler {
+	issuerURL, err := url.Parse("https://" + domain + "/")
+	if err != nil {
+		log.Fatalf("Failed to parse the issuer url: %v", err)
+	}
 
-		if !ok {
-			return nil, errors.New("authorized parties are required")
-		}
-		if azp != clientID {
-			return nil, errors.New("invalid authorized parties")
-		}
+	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
 
-		// issフィールドを見て、正しいトークン発行者か確認する
-		iss := fmt.Sprintf("https://%s/", domain)
-		ok = token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
-		if !ok {
-			return nil, errors.New("invalid issuer")
-		}
+	jwtValidator, err := validator.New(
+		provider.KeyFunc,
+		validator.RS256,
+		issuerURL.String(),
+		[]string{audience},
+		validator.WithCustomClaims(
+			func() validator.CustomClaims {
+				return &CustomClaims{}
+			},
+		),
+		validator.WithAllowedClockSkew(time.Minute),
+	)
+	if err != nil {
+		log.Fatalf("Failed to set up the jwt validator")
+	}
 
-		// JWTの検証に必要な鍵を生成する
-		cert, err := createPemCert(jwks, token)
-		if err != nil {
-			return nil, err
-		}
+	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
+		log.Printf("Encountered error while validating JWT: %v", err)
 
-		return jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
+	}
+
+	middleware := jwtmiddleware.New(
+		jwtValidator.ValidateToken,
+		jwtmiddleware.WithErrorHandler(errorHandler),
+	)
+
+	return func(next http.Handler) http.Handler {
+		return middleware.CheckJWT(next)
 	}
 }

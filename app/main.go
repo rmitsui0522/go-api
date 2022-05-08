@@ -23,10 +23,7 @@ func main() {
 	// initializing middlewares
 	logMiddleware := logger.NewMiddleware(log)
 	corsMiddleware := cors.NewMiddleware()
-	jwtMiddleware, err := auth0.NewMiddleware()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Fatal: initialize jwt middleware")
-	}
+	jwtMiddleware := auth0.NewMiddleware()
 
 	handler := alice.New(corsMiddleware, logMiddleware, jwtMiddleware).Then(api)
 

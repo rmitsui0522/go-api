@@ -1,27 +1,27 @@
 package handler
 
 import (
-	"go-api/pkg/v1/auth"
-	"go-api/pkg/v1/health"
-	"go-api/pkg/v1/users"
+	"net/http"
+
+	"go-api/pkg/middleware/auth0"
+	"go-api/pkg/middleware/cors"
+	"go-api/pkg/middleware/logger"
+	v1 "go-api/pkg/v1"
 
 	"github.com/gorilla/mux"
+	"github.com/justinas/alice"
 )
 
-func New() *mux.Router {
-	handler := mux.NewRouter()
-	api := handler.PathPrefix("/api").Subrouter()
-	v1 := api.PathPrefix("/v1").Subrouter()
+func New() http.Handler {
+	router := mux.NewRouter()
+	v1.New(router.PathPrefix("/api/v1").Subrouter())
 
-	handler.HandleFunc("/health", health.Health()).Methods("GET")
+	log := logger.NewLogger()
 
-	v1.HandleFunc("/auth", auth.Authentication()).Methods("POST")
+	// initializing middlewares
+	corsMiddleware := cors.NewMiddleware()
+	logMiddleware := logger.NewMiddleware(log)
+	jwtMiddleware := auth0.NewMiddleware()
 
-	v1.HandleFunc("/users", users.GetAllUsers()).Methods("GET")
-	v1.HandleFunc("/users", users.CreateUser()).Methods("POST")
-	v1.HandleFunc("/users/{id}", users.GetUser()).Methods("GET")
-	v1.HandleFunc("/users/{id}", users.UpdateUser()).Methods("PUT")
-	v1.HandleFunc("/users/{id}", users.DeleteUser()).Methods("DELETE")
-
-	return handler
+	return alice.New(corsMiddleware, logMiddleware, jwtMiddleware).Then(router)
 }

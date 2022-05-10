@@ -7,29 +7,17 @@ import (
 	"os/signal"
 
 	conn "go-api/pkg/connection"
-	apiHandler "go-api/pkg/handler"
-	"go-api/pkg/middleware/auth0"
-	"go-api/pkg/middleware/cors"
+	"go-api/pkg/handler"
 	"go-api/pkg/middleware/logger"
 	"go-api/pkg/model"
-
-	"github.com/justinas/alice"
 )
 
 func main() {
-	api := apiHandler.New()
 	log := logger.NewLogger()
-
-	// initializing middlewares
-	logMiddleware := logger.NewMiddleware(log)
-	corsMiddleware := cors.NewMiddleware()
-	jwtMiddleware := auth0.NewMiddleware()
-
-	handler := alice.New(corsMiddleware, logMiddleware, jwtMiddleware).Then(api)
 
 	server := &http.Server{
 		Addr:    conn.Port(),
-		Handler: handler,
+		Handler: handler.New(),
 	}
 
 	defer model.DB.Close()

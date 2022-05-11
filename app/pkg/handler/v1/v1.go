@@ -3,16 +3,13 @@ package v1
 import (
 	"go-api/pkg/middleware/auth0"
 
-	"go-api/pkg/v1/auth"
-	"go-api/pkg/v1/health"
-	"go-api/pkg/v1/users"
+	"go-api/pkg/handler/v1/auth"
+	"go-api/pkg/handler/v1/users"
 
 	"github.com/gorilla/mux"
 )
 
 func New(v1 *mux.Router) {
-	v1.HandleFunc("/health", health.Health()).Methods("GET")
-
 	v1.HandleFunc("/auth", auth.Authentication()).Methods("POST")
 
 	v1.HandleFunc("/users", auth0.UseScope(users.GetAllUsers(), auth0.READABLE)).Methods("GET")

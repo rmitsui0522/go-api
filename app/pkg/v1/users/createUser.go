@@ -16,17 +16,23 @@ func CreateUser() http.HandlerFunc {
 		validate := validator.New()
 
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		if err := validate.Struct(&user); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		if err := model.CreateUser(&user); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 

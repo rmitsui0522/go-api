@@ -15,13 +15,17 @@ func DeleteUser() http.HandlerFunc {
 		params := mux.Vars(r)
 		id, err := strconv.Atoi(params["id"])
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		user, err := model.DeleteUser(&model.User{ID: uint(id)})
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			utility.RespondJSON(w, http.StatusInternalServerError, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 

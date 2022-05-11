@@ -12,7 +12,9 @@ func GetAllUsers() http.HandlerFunc {
 		users, err := model.FindUsers()
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			utility.RespondJSON(w, http.StatusInternalServerError, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 

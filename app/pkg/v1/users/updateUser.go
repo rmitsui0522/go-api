@@ -20,23 +20,31 @@ func UpdateUser() http.HandlerFunc {
 		params := mux.Vars(r)
 		id, err := strconv.Atoi(params["id"])
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		if err := validate.Struct(&data); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			utility.RespondJSON(w, http.StatusBadRequest, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 
 		user, err := model.UpdateUser(&model.User{ID: uint(id)}, &data)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			utility.RespondJSON(w, http.StatusInternalServerError, map[string]string{
+				"message": err.Error(),
+			})
 			return
 		}
 

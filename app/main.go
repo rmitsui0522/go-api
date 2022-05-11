@@ -8,12 +8,11 @@ import (
 
 	conn "go-api/pkg/connection"
 	"go-api/pkg/handler"
-	"go-api/pkg/middleware/logger"
+	"go-api/pkg/logger"
 	"go-api/pkg/model"
 )
 
 func main() {
-	log := logger.NewLogger()
 
 	server := &http.Server{
 		Addr:    conn.Port(),
@@ -27,16 +26,16 @@ func main() {
 		signal.Notify(stop, os.Interrupt)
 
 		<-stop
-		log.Info().Msg("Shutting down...")
+		logger.Info("Shutting down...")
 
 		if err := server.Shutdown(context.Background()); err != nil {
-			log.Error().Err(err).Msg("server.Shutdown() failed: ")
+			logger.Error("server.Shutdown() failed: " + err.Error())
 		}
-		log.Info().Msg("Server stopped.")
+		logger.Info("Server stopped.")
 	}()
 
-	log.Info().Msg("server listening on http://localhost" + conn.Port())
+	logger.Info("server listening on http://localhost" + conn.Port())
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		log.Fatal().Err(err).Msg("Fatal: server.ListenAndServe()")
+		logger.Fatal("server.ListenAndServe() failed: " + err.Error())
 	}
 }

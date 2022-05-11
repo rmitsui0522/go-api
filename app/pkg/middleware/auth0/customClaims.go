@@ -2,7 +2,6 @@ package auth0
 
 import (
 	"context"
-	"fmt"
 	"strings"
 )
 
@@ -19,7 +18,7 @@ func (c CustomClaims) Validate(ctx context.Context) error {
 // クレームに期待されるスコープが含まれているか検証する
 func (c CustomClaims) HasScope(expectedScope string) bool {
 	result := strings.Split(c.Scope, " ")
-	fmt.Println(c.Scope)
+
 	for i := range result {
 		if result[i] == expectedScope {
 			return true

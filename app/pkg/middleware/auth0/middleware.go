@@ -1,11 +1,11 @@
 package auth0
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
+	"go-api/pkg/logger"
 	"go-api/pkg/utility"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
@@ -17,7 +17,7 @@ import (
 func NewMiddleware() func(next http.Handler) http.Handler {
 	issuerURL, err := url.Parse("https://" + DOMAIN + "/")
 	if err != nil {
-		log.Fatalf("Failed to parse the issuer url: %v", err)
+		logger.Fatal("Failed to parse the issuer url: " + err.Error())
 	}
 
 	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
@@ -35,11 +35,11 @@ func NewMiddleware() func(next http.Handler) http.Handler {
 		validator.WithAllowedClockSkew(time.Minute),
 	)
 	if err != nil {
-		log.Fatalf("Failed to set up the jwt validator")
+		logger.Fatal("Failed to set up the jwt validator")
 	}
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
-		log.Printf("Encountered error while validating JWT: %v", err)
+		logger.Error("Encountered error while validating JWT: " + err.Error())
 		utility.RespondJSON(w, http.StatusUnauthorized, map[string]string{
 			"message": "Encountered error while validating jwt.",
 		})

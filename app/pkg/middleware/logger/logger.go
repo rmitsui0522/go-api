@@ -1,14 +1,28 @@
 package logger
 
 import (
-	"os"
+	"net/http"
 
-	"github.com/rs/zerolog"
+	"go-api/pkg/logger"
+	"go-api/pkg/utility"
 )
 
-func NewLogger() zerolog.Logger {
-	consoleWriter := zerolog.ConsoleWriter{Out: os.Stdout}
-	logger := zerolog.New(consoleWriter).With().Timestamp().Logger()
+func NewMiddleware() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-	return logger
+			defer func() {
+				if err := recover(); err != nil {
+					utility.RespondJSON(w, http.StatusInternalServerError, map[string]interface{}{
+						"message": err,
+					})
+					logger.Panic("panic")
+				}
+			}()
+
+			next.ServeHTTP(w, r)
+
+			logger.RequestInfo("request", r)
+		})
+	}
 }

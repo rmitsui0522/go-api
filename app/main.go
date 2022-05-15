@@ -9,7 +9,6 @@ import (
 	conn "go-api/pkg/connection"
 	"go-api/pkg/handler"
 	"go-api/pkg/logger"
-	"go-api/pkg/model"
 )
 
 func main() {
@@ -18,8 +17,6 @@ func main() {
 		Addr:    conn.Port(),
 		Handler: handler.New(),
 	}
-
-	defer model.DB.Close()
 
 	go func() {
 		stop := make(chan os.Signal, 1)

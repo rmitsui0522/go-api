@@ -40,7 +40,9 @@ func UpdateUser() http.HandlerFunc {
 			return
 		}
 
-		user, err := model.UpdateUser(&model.User{ID: uint(id)}, &data)
+		data.ID = uint(id)
+
+		user, err := model.UpdateUser(&data)
 		if err != nil {
 			utility.RespondJSON(w, http.StatusInternalServerError, map[string]string{
 				"message": err.Error(),

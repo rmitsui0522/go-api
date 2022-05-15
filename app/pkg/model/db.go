@@ -1,20 +1,21 @@
 package model
 
 import (
-	"log"
-
 	conn "go-api/pkg/connection"
+	"go-api/pkg/logger"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func init() {
 	var err error
-	DB, err = gorm.Open("mysql", conn.Dsn())
+	var dsn *conn.DSN
+
+	DB, err = gorm.Open(mysql.Open(dsn.MySQL()), &gorm.Config{})
 	if err != nil {
-		log.Fatal("gorm.Open() failed: ", err)
+		logger.Fatal("Failed to connect database: " + err.Error())
 	}
 }

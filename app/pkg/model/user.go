@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID        uint      `json:"id" param:"id"`
+	ID        uint      `json:"id" gorm:"primaryKey"`
 	FirstName string    `json:"firstName" validate:"required"`
 	LastName  string    `json:"lastName" validate:"required"`
 	Account   string    `json:"mailAddress" validate:"required,email"`
@@ -32,10 +32,12 @@ func CreateUser(u *User) error {
 	return DB.Create(u).Error
 }
 
-func UpdateUser(u *User, d *User) (User, error) {
+func UpdateUser(u *User) (User, error) {
 	var user User
-	d.UpdateAt = time.Now().Round(time.Second)
-	err := DB.Where(u).Find(&user).Update(d).Error
+	u.UpdateAt = time.Now().Round(time.Second)
+
+	err := DB.Where(&User{ID: u.ID}).Updates(u).First(&user).Error
+
 	return user, err
 }
 

@@ -6,24 +6,16 @@ import (
 	"os"
 )
 
-const defaultPort = "3000"
+type DSN struct{}
 
-func Port() string {
-	p := os.Getenv("PORT")
-	if p != "" {
-		return ":" + p
-	}
-	return ":" + defaultPort
-}
-
-func Dsn() string {
+func (d *DSN) MySQL() string {
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	protocol := os.Getenv("DB_PROTOCOL")
 	dbName := os.Getenv("DB_DATABASE")
 
 	if user == "" || password == "" || protocol == "" || dbName == "" {
-		log.Fatal("dsn() failed: some empty go.Getenv variables.")
+		log.Fatal("dsn() failed: some empty variables from os.Getenv.")
 	}
 
 	connStr := fmt.Sprintf(

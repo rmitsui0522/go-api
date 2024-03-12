@@ -8,19 +8,23 @@ import (
 	"go-api/pkg/middleware"
 
 	"github.com/gorilla/mux"
-	"github.com/justinas/alice"
 )
 
 func New() http.Handler {
-	router := mux.NewRouter()
-	v1.New(router.PathPrefix("/api/v1").Subrouter())
+	// initialize routers
+	api := mux.NewRouter()
 
-	router.HandleFunc("/health", health.Health()).Methods("GET")
-
-	// initializing middlewares
+	// initialize middlewares
 	corsMiddleware := middleware.CORS
 	logMiddleware := middleware.Logger
-	jwtMiddleware := middleware.JWT
 
-	return alice.New(corsMiddleware, logMiddleware, jwtMiddleware).Then(router)
+	// apply middlewares
+	api.Use(corsMiddleware)
+	api.Use(logMiddleware)
+
+	// register routes
+	api.HandleFunc("/health", health.Health()).Methods("GET")
+	v1.RegisterHandlerFunc(api)
+
+	return api
 }

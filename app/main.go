@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	conn "go-api/pkg/connection"
+	"go-api/pkg/connection"
 	"go-api/pkg/handler"
 	"go-api/pkg/logger"
 )
@@ -14,7 +14,7 @@ import (
 func main() {
 
 	server := &http.Server{
-		Addr:    conn.Port(),
+		Addr:    connection.Port(),
 		Handler: handler.New(),
 	}
 
@@ -28,10 +28,12 @@ func main() {
 		if err := server.Shutdown(context.Background()); err != nil {
 			logger.Error("server.Shutdown() failed: " + err.Error())
 		}
+
 		logger.Info("Server stopped.")
 	}()
 
-	logger.Info("server listening on http://localhost" + conn.Port())
+	logger.Info("server listening on http://localhost" + connection.Port())
+
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		logger.Fatal("server.ListenAndServe() failed: " + err.Error())
 	}

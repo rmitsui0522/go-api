@@ -1,7 +1,7 @@
 package model
 
 import (
-	conn "go-api/pkg/connection"
+	"go-api/pkg/connection"
 	"go-api/pkg/logger"
 
 	"gorm.io/driver/mysql"
@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func init() {
 	var err error
-	var dsn *conn.DSN
+	var dsn *connection.DSN
 
 	DB, err = gorm.Open(mysql.Open(dsn.MySQL()), &gorm.Config{})
 	if err != nil {

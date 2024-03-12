@@ -5,11 +5,17 @@ import (
 
 	"go-api/pkg/handler/v1/auth"
 	"go-api/pkg/handler/v1/users"
+	"go-api/pkg/middleware"
 
 	"github.com/gorilla/mux"
 )
 
-func New(v1 *mux.Router) {
+func RegisterHandlerFunc(api *mux.Router) {
+	v1 := api.PathPrefix("/api/v1").Subrouter()
+	jwtMiddleware := middleware.JWT
+
+	v1.Use(jwtMiddleware)
+
 	v1.HandleFunc("/auth", auth.Authentication()).Methods("POST")
 
 	v1.HandleFunc("/users", auth0.UseScope(users.GetAllUsers(), auth0.READABLE)).Methods("GET")

@@ -20,5 +20,5 @@ func init() {
 		logger.Fatal("Failed to connect database: " + err.Error())
 	}
 
-	db.AutoMigrate(&model.Employee{}, &model.Employment{})
+	db.AutoMigrate(&model.Employee{}, &model.Employee{})
 }
